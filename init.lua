@@ -99,10 +99,10 @@ vim.g.maplocalleader = ' '
 vim.opt.number = true
 -- You can also add relative line numbers, for help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
-vim.opt.mouse = 'a'
+--vim.opt.mouse = 'a'
 
 -- Don't show the mode, since it's already in status line
 vim.opt.showmode = false
@@ -147,6 +147,9 @@ vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
+
+-- Show ruller on column 88
+vim.opt.colorcolumn = '88'
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -296,6 +299,11 @@ require('lazy').setup {
     event = 'VeryLazy',
     branch = '0.1.x',
     dependencies = {
+      'nvim-telescope/telescope-live-grep-args.nvim',
+      -- This will not install any breaking changes.
+      -- For major updates, this must be adjusted manually
+      version = '^1.0.0',
+
       'nvim-lua/plenary.nvim',
       { -- If encountering errors, see telescope-fzf-native README for install instructions
         'nvim-telescope/telescope-fzf-native.nvim',
@@ -359,6 +367,8 @@ require('lazy').setup {
       -- Enable telescope extensions, if they are installed
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
+      pcall(require('telescope').load_extension, 'live_grep_args')
+      --pcall(require('telescope').load_extension, 'vim_bookmarks')
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
@@ -395,7 +405,15 @@ require('lazy').setup {
       vim.keymap.set('n', '<leader>sn', function()
         builtin.find_files { cwd = vim.fn.stdpath 'config' }
       end, { desc = '[S]earch [N]eovim files' })
+
+      -- Shortcut for VimWiki Open Tasks
+      vim.keymap.set('n', '<leader>st', function()
+        builtin.grep_string { cwd = '~/vimwiki', search = '- [ ]' }
+      end, { desc = '[S]earch VimWiki [T]asks' })
     end,
+
+    -- Shortcut for Vim Commands
+    vim.keymap.set('n', '<leader>sc', '<cmd>Telescope commands<CR>', { desc = 'Show all VIM commands' }),
   },
 
   { -- LSP Configuration & Plugins
@@ -533,7 +551,7 @@ require('lazy').setup {
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        -- pyright = {},
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -716,23 +734,6 @@ require('lazy').setup {
     end,
   },
 
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`
-    'folke/tokyonight.nvim',
-    lazy = false, -- make sure we load this during startup if it is your main colorscheme
-    priority = 1000, -- make sure to load this before all the other start plugins
-    config = function()
-      -- Load the colorscheme here
-      vim.cmd.colorscheme 'tokyonight-night'
-
-      -- You can configure highlights by doing something like
-      vim.cmd.hi 'Comment gui=none'
-    end,
-  },
-
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
@@ -807,14 +808,14 @@ require('lazy').setup {
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
   -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.indent_line',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
 }
 
 -- The line beneath this is called `modeline`. See `:help modeline`
